@@ -1,5 +1,6 @@
 package online.ludzh.contentcenter;
 
+import lombok.RequiredArgsConstructor;
 import online.ludzh.contentcenter.domain.dao.user.UserMapper;
 import online.ludzh.contentcenter.domain.entity.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,10 @@ import java.util.Date;
  * Created by mi-ludzh on 0003 2019/11/3.
  */
 @RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TestController {
 
-    @Autowired
-    UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @GetMapping("/test")
     public User testInsert(){
