@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * Created by mi-ludzh on 0003 2019/11/3.
@@ -38,10 +40,14 @@ public class ShareService {
 
         List<ServiceInstance> instances = discoveryClient.getInstances("user-center");
 
-        String targetURL = instances.stream()
+        List<String> targetURLS = instances.stream()
+                // 数据变换
                 .map(instance -> instance.getUri().toString() + "/users/{id}")
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("当前没有实例"));
+                .collect(Collectors.toList());
+
+        int i = ThreadLocalRandom.current().nextInt(targetURLS.size());
+        String targetURL = targetURLS.get(i);
+
         log.info("请求的目标地址:{}", targetURL);
         UserDTO userDTO = this.restTemplate.getForObject(
                 targetURL,

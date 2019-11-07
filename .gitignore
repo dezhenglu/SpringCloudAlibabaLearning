@@ -1,4 +1,6 @@
 
+centent-center/target
+centent-center/target/*
 *.iml
 *.class
 /target/
