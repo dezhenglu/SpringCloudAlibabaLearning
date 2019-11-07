@@ -30,27 +30,15 @@ public class ShareService {
 
     private final RestTemplate restTemplate;
 
-    private final DiscoveryClient discoveryClient;
-
     public ShareDTO findById(Integer id){
         // 获取分享详情
         Share share = this.shareMapper.selectByPrimaryKey(id);
         // 发布人id
         Integer userId = share.getUserId();
 
-        List<ServiceInstance> instances = discoveryClient.getInstances("user-center");
 
-        List<String> targetURLS = instances.stream()
-                // 数据变换
-                .map(instance -> instance.getUri().toString() + "/users/{id}")
-                .collect(Collectors.toList());
-
-        int i = ThreadLocalRandom.current().nextInt(targetURLS.size());
-        String targetURL = targetURLS.get(i);
-
-        log.info("请求的目标地址:{}", targetURL);
         UserDTO userDTO = this.restTemplate.getForObject(
-                targetURL,
+                "http://user-center/users/{userId}",
                 UserDTO.class, userId
         );
 
