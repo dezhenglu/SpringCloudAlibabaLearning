@@ -17,9 +17,13 @@ public class RibbonConfiguration {
 
     @Bean
     public IRule ribbonRule(){
+        // nacos权重 负载均衡
         // return new NacosWeightedRule();
+        // nacos权重 负载均衡 + 同集群有限调用
         // return new NacosSameClusterWeightedRule();
-        // return new NacosRule();
-        return new NacosFinalRule();
+        // 同上, nacos 新版本增加这个功能
+        return new NacosRule();
+        // nacos 权重 同集群 版本限制
+        // return new NacosFinalRule();
     }
 }

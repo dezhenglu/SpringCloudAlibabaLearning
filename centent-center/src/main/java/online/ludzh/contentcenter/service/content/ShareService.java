@@ -6,6 +6,7 @@ import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
 import online.ludzh.contentcenter.domain.dto.content.ShareDTO;
 import online.ludzh.contentcenter.domain.dto.user.UserDTO;
 import online.ludzh.contentcenter.domain.entity.content.Share;
+import online.ludzh.contentcenter.feignclient.UserCenterFeignClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -28,7 +29,7 @@ public class ShareService {
 
     private final ShareMapper shareMapper;
 
-    private final RestTemplate restTemplate;
+    private final UserCenterFeignClient userCenterFeignClient;
 
     public ShareDTO findById(Integer id){
         // 获取分享详情
@@ -36,11 +37,11 @@ public class ShareService {
         // 发布人id
         Integer userId = share.getUserId();
 
-
-        UserDTO userDTO = this.restTemplate.getForObject(
-                "http://user-center/users/{userId}",
-                UserDTO.class, userId
-        );
+        // 1. 代码不可读
+        // 2. 复杂的url难以维护: https://user-center/s?ie={ie}&chrome={c}.....
+        // 3. 难以响应需求变化, 变化很没有幸福感
+        // 4. 变成体验不统一
+        UserDTO userDTO = userCenterFeignClient.findById(userId);
 
         // 消息的装配
         ShareDTO shareDTO = new ShareDTO();
