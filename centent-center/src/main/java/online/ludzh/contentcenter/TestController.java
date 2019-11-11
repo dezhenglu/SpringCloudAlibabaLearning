@@ -2,6 +2,7 @@ package online.ludzh.contentcenter;
 
 import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
 import online.ludzh.contentcenter.domain.entity.content.Share;
+import online.ludzh.contentcenter.feignclient.TestBaiduFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -57,5 +58,17 @@ public class TestController {
     public List<String> getServices(){
         // 查询指定服务的所有实例的信息
         return this.discoveryClient.getServices();
+    }
+
+    @Autowired
+    TestBaiduFeignClient testBaiduFeignClient;
+
+    /**
+     * 测试: Feign脱离Ribbon使用
+     * @return
+     */
+    @GetMapping("/baidu")
+    public String baiduIndex(){
+        return testBaiduFeignClient.index();
     }
 }
