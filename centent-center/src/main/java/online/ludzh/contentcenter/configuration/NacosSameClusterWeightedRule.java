@@ -73,8 +73,3 @@ public class NacosSameClusterWeightedRule extends AbstractLoadBalancerRule {
         }
     }
 }
-class ExtendBalancer extends Balancer {
-    public static Instance getHostByRandomWeight2(List<Instance> hosts) {
-        return getHostByRandomWeight(hosts);
-    }
-}
