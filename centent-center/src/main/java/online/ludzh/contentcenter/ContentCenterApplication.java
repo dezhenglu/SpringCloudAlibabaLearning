@@ -1,5 +1,6 @@
 package online.ludzh.contentcenter;
 
+import online.ludzh.contentcenter.configuration.GlobalFeignConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -9,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 @tk.mybatis.spring.annotation.MapperScan(basePackages = "online.ludzh")
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(defaultConfiguration = GlobalFeignConfiguration.class)
 public class ContentCenterApplication {
 
 	public static void main(String[] args) {
