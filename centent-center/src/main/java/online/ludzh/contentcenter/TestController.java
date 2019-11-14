@@ -1,5 +1,6 @@
 package online.ludzh.contentcenter;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
 import online.ludzh.contentcenter.domain.entity.content.Share;
 import online.ludzh.contentcenter.feignclient.TestBaiduFeignClient;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -70,5 +72,26 @@ public class TestController {
     @GetMapping("/baidu")
     public String baiduIndex(){
         return testBaiduFeignClient.index();
+    }
+
+    @Autowired
+    private TestService testService;
+
+    @GetMapping("test-a")
+    public String testA() {
+        this.testService.common();
+        return "test-a";
+    }
+
+    @GetMapping("test-b")
+    public String testB() {
+        this.testService.common();
+        return "test-b";
+    }
+
+    @SentinelResource("hot")
+    @GetMapping("test-hot")
+    public String testHot(@RequestParam(required = false) String a, @RequestParam(required = false) String b) {
+        return a + " " + b;
     }
 }
