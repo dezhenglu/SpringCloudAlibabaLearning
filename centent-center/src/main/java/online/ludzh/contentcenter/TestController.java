@@ -1,9 +1,15 @@
 package online.ludzh.contentcenter;
 
+import com.alibaba.csp.sentinel.Entry;
+import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import lombok.extern.slf4j.Slf4j;
 import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
 import online.ludzh.contentcenter.domain.entity.content.Share;
 import online.ludzh.contentcenter.feignclient.TestBaiduFeignClient;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -17,6 +23,7 @@ import java.util.List;
 /**
  * Created by mi-ludzh on 0003 2019/11/3.
  */
+@Slf4j
 @RestController
 public class TestController {
 
@@ -93,5 +100,32 @@ public class TestController {
     @GetMapping("test-hot")
     public String testHot(@RequestParam(required = false) String a, @RequestParam(required = false) String b) {
         return a + " " + b;
+    }
+
+    @GetMapping("test-sentinel-api")
+    public String testSentinelAPI(@RequestParam(required = false) String a){
+        // 定义一个Sentinel保护的资源, 名称是test-sentinel-api
+        Entry entry = null;
+        try {
+            entry = SphU.entry("test-sentinel-api");
+            // 被保护的业务逻辑
+            if(StringUtils.isBlank(a)){
+                throw new IllegalArgumentException("a不能为空");
+            }
+            return a;
+        } catch (BlockException e) {
+            // 如果被保护的资源被限流或者降级了, 就会抛BlockException
+            log.warn("限流, 或者降级了" , e);
+            return "限流, 或者降级了";
+        } catch (IllegalArgumentException e2){
+            // 统计IllegalArgumentException [发生次数, 发生占比]
+            Tracer.trace(e2);
+            return "参数非法!";
+        }finally {
+            if(entry != null){
+                // 退出Entry
+                entry.close();
+            }
+        }
     }
 }
