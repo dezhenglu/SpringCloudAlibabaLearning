@@ -4,6 +4,7 @@ import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import lombok.extern.slf4j.Slf4j;
 import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
@@ -102,12 +103,24 @@ public class TestController {
         return a + " " + b;
     }
 
+    /**
+     * SphU         定义资源,让资源受到监控,并且可以保护资源
+     * Tracer       可以对想要的异常进行统计
+     * ContextUtil  可以标记调用来源,还可以标记调用
+     * @param a
+     * @return
+     */
     @GetMapping("test-sentinel-api")
     public String testSentinelAPI(@RequestParam(required = false) String a){
+
+        String resourceName = "est-sentinel-api";
+
+        ContextUtil.enter(resourceName, "test-wfw");
+
         // 定义一个Sentinel保护的资源, 名称是test-sentinel-api
         Entry entry = null;
         try {
-            entry = SphU.entry("test-sentinel-api");
+            entry = SphU.entry(resourceName);
             // 被保护的业务逻辑
             if(StringUtils.isBlank(a)){
                 throw new IllegalArgumentException("a不能为空");
@@ -126,6 +139,7 @@ public class TestController {
                 // 退出Entry
                 entry.close();
             }
+            ContextUtil.exit();
         }
     }
 }
