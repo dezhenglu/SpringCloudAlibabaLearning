@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
 import online.ludzh.contentcenter.domain.entity.content.Share;
 import online.ludzh.contentcenter.feignclient.TestBaiduFeignClient;
+import online.ludzh.contentcenter.sentineltest.TestControllerBlockHandlerClass;
+import online.ludzh.contentcenter.sentineltest.TestControllerFallbackHandlerClass;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -144,33 +146,13 @@ public class TestController {
     }
 
     @GetMapping("test-sentinel-resource")
-    @SentinelResource(value = "test-sentinel-api", blockHandler = "block")
+    @SentinelResource(value = "test-sentinel-api",
+            blockHandlerClass = TestControllerBlockHandlerClass.class, blockHandler = "block",
+            fallbackClass = TestControllerFallbackHandlerClass.class, fallback = "fallback")
     public String testSentinelResource(@RequestParam(required = false) String a){
         if(StringUtils.isBlank(a)){
             throw new IllegalArgumentException("a cannot be blank");
         }
         return a;
-    }
-
-    /**
-     * 处理限流或者降级
-     * @param a
-     * @param e
-     * @return
-     */
-    public String block(String a, BlockException e){
-        log.warn("限流, 或者降级了" , e);
-        return "限流, 或者降级了 block";
-    }
-
-    /**
-     * 处理降级
-     * @param a
-     * @param e
-     * @return
-     */
-    public String fallback(String a, Throwable e){
-        log.warn("限流, 或者降级了" , e);
-        return "限流, 或者降级了 fallback";
     }
 }
