@@ -113,7 +113,7 @@ public class TestController {
     @GetMapping("test-sentinel-api")
     public String testSentinelAPI(@RequestParam(required = false) String a){
 
-        String resourceName = "est-sentinel-api";
+        String resourceName = "test-sentinel-api";
 
         ContextUtil.enter(resourceName, "test-wfw");
 
@@ -141,5 +141,36 @@ public class TestController {
             }
             ContextUtil.exit();
         }
+    }
+
+    @GetMapping("test-sentinel-resource")
+    @SentinelResource(value = "test-sentinel-api", blockHandler = "block")
+    public String testSentinelResource(@RequestParam(required = false) String a){
+        if(StringUtils.isBlank(a)){
+            throw new IllegalArgumentException("a cannot be blank");
+        }
+        return a;
+    }
+
+    /**
+     * 处理限流或者降级
+     * @param a
+     * @param e
+     * @return
+     */
+    public String block(String a, BlockException e){
+        log.warn("限流, 或者降级了" , e);
+        return "限流, 或者降级了 block";
+    }
+
+    /**
+     * 处理降级
+     * @param a
+     * @param e
+     * @return
+     */
+    public String fallback(String a, Throwable e){
+        log.warn("限流, 或者降级了" , e);
+        return "限流, 或者降级了 fallback";
     }
 }
