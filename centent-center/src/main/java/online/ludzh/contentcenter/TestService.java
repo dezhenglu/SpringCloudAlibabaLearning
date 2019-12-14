@@ -4,15 +4,11 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by ludzh on 2019/11/14.
- */
 @Slf4j
 @Service
 public class TestService {
-
-    @SentinelResource("common")
-    public String common(){
+    @SentinelResource("commontest")
+    public String common() {
         log.info("common....");
         return "common";
     }

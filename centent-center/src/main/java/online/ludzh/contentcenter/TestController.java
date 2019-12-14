@@ -6,6 +6,9 @@ import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.alibaba.csp.sentinel.slots.block.RuleConstant;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import lombok.extern.slf4j.Slf4j;
 import online.ludzh.contentcenter.domain.dao.content.ShareMapper;
 import online.ludzh.contentcenter.domain.entity.content.Share;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -87,13 +91,13 @@ public class TestController {
     @Autowired
     private TestService testService;
 
-    @GetMapping("test-a")
+    @GetMapping("/test-a")
     public String testA() {
         this.testService.common();
         return "test-a";
     }
 
-    @GetMapping("test-b")
+    @GetMapping("/test-b")
     public String testB() {
         this.testService.common();
         return "test-b";
@@ -104,6 +108,24 @@ public class TestController {
     public String testHot(@RequestParam(required = false) String a, @RequestParam(required = false) String b) {
         return a + " " + b;
     }
+
+    @GetMapping("test-add-flow-rule")
+    public String testHot() {
+        initFlowQpsRule();
+        return "success";
+    }
+
+    private void initFlowQpsRule() {
+        List<FlowRule> rules = new ArrayList<>();
+        FlowRule rule = new FlowRule("/shares/1");
+        // set limit qps to 20
+        rule.setCount(20);
+        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        rule.setLimitApp("default");
+        rules.add(rule);
+        FlowRuleManager.loadRules(rules);
+    }
+
 
     /**
      * SphU         定义资源,让资源受到监控,并且可以保护资源
